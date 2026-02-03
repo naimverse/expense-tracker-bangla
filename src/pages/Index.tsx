@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import DayCard from "@/components/DayCard";
 import AddDateForm from "@/components/AddDateForm";
+import MonthlySummary from "@/components/MonthlySummary";
 import { useExpenses } from "@/hooks/useExpenses";
 
 const Index = () => {
@@ -12,6 +13,8 @@ const Index = () => {
       
       <main className="container max-w-2xl mx-auto px-4 py-6">
         <AddDateForm onAdd={addDate} />
+        
+        <MonthlySummary expenses={expenses} />
         
         <div className="space-y-4">
           {expenses.map((dayExpense) => (
