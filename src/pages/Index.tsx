@@ -1,23 +1,44 @@
+import { useState } from "react";
 import Header from "@/components/Header";
 import DayCard from "@/components/DayCard";
 import AddDateForm from "@/components/AddDateForm";
-import MonthlySummary from "@/components/MonthlySummary";
+import MonthlySummary, { getMonthKey } from "@/components/MonthlySummary";
 import { useExpenses } from "@/hooks/useExpenses";
 
 const Index = () => {
   const { expenses, grandTotal, addDate, deleteDate, addItem, deleteItem } = useExpenses();
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+
+  const filteredExpenses = selectedMonth
+    ? expenses.filter((day) => getMonthKey(day.date) === selectedMonth)
+    : expenses;
+
+  const filteredTotal = filteredExpenses.reduce(
+    (total, day) => total + day.items.reduce((sum, item) => sum + item.amount, 0),
+    0
+  );
 
   return (
     <div className="min-h-screen bg-background">
-      <Header grandTotal={grandTotal} />
+      <Header grandTotal={selectedMonth ? filteredTotal : grandTotal} />
       
       <main className="container max-w-2xl mx-auto px-4 py-6">
         <AddDateForm onAdd={addDate} />
         
-        <MonthlySummary expenses={expenses} />
+        <MonthlySummary 
+          expenses={expenses} 
+          selectedMonth={selectedMonth}
+          onSelectMonth={setSelectedMonth}
+        />
+        
+        {selectedMonth && (
+          <p className="text-sm text-muted-foreground mb-4 text-center">
+            {filteredExpenses.length} দিনের খরচ দেখাচ্ছে
+          </p>
+        )}
         
         <div className="space-y-4">
-          {expenses.map((dayExpense) => (
+          {filteredExpenses.map((dayExpense) => (
             <DayCard
               key={dayExpense.id}
               dayExpense={dayExpense}
@@ -28,9 +49,11 @@ const Index = () => {
           ))}
         </div>
 
-        {expenses.length === 0 && (
+        {filteredExpenses.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-muted-foreground text-lg">কোনো খরচ নেই</p>
+            <p className="text-muted-foreground text-lg">
+              {selectedMonth ? "এই মাসে কোনো খরচ নেই" : "কোনো খরচ নেই"}
+            </p>
             <p className="text-muted-foreground">উপরে তারিখ যোগ করে শুরু করুন</p>
           </div>
         )}
