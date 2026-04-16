@@ -3,10 +3,11 @@ import Header from "@/components/Header";
 import DayCard from "@/components/DayCard";
 import AddDateForm from "@/components/AddDateForm";
 import MonthlySummary, { getMonthKey } from "@/components/MonthlySummary";
+import CategoryManager from "@/components/CategoryManager";
 import { useExpenses } from "@/hooks/useExpenses";
 
 const Index = () => {
-  const { expenses, grandTotal, addDate, deleteDate, addItem, deleteItem } = useExpenses();
+  const { expenses, categories, grandTotal, addDate, deleteDate, addItem, deleteItem, addCategory, deleteCategory } = useExpenses();
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
 
   const filteredExpenses = selectedMonth
@@ -24,6 +25,12 @@ const Index = () => {
       
       <main className="container max-w-2xl mx-auto px-4 py-6">
         <AddDateForm onAdd={addDate} />
+
+        <CategoryManager
+          categories={categories}
+          onAdd={addCategory}
+          onDelete={deleteCategory}
+        />
         
         <MonthlySummary 
           expenses={expenses} 
@@ -42,6 +49,7 @@ const Index = () => {
             <DayCard
               key={dayExpense.id}
               dayExpense={dayExpense}
+              categories={categories}
               onAddItem={addItem}
               onDeleteItem={deleteItem}
               onDeleteDay={deleteDate}
