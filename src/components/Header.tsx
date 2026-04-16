@@ -1,4 +1,5 @@
-import { ShoppingBasket, Wallet } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ShoppingBasket, Wallet, BarChart3 } from "lucide-react";
 
 interface HeaderProps {
   grandTotal: number;
@@ -18,11 +19,20 @@ const Header = ({ grandTotal }: HeaderProps) => {
               <p className="text-sm text-muted-foreground">দৈনিক হিসাব রাখুন</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-accent px-4 py-2 rounded-xl">
-            <Wallet className="h-5 w-5 text-accent-foreground" />
-            <div className="text-right">
-              <p className="text-xs text-muted-foreground">মোট খরচ</p>
-              <p className="text-lg font-bold text-accent-foreground">৳{grandTotal}</p>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/dashboard"
+              className="p-2.5 rounded-xl bg-secondary/10 hover:bg-secondary/20 transition-colors"
+              title="ড্যাশবোর্ড"
+            >
+              <BarChart3 className="h-5 w-5 text-secondary" />
+            </Link>
+            <div className="flex items-center gap-2 bg-accent px-4 py-2 rounded-xl">
+              <Wallet className="h-5 w-5 text-accent-foreground" />
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground">মোট খরচ</p>
+                <p className="text-lg font-bold text-accent-foreground">৳{grandTotal}</p>
+              </div>
             </div>
           </div>
         </div>
