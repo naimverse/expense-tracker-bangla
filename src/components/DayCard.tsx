@@ -2,16 +2,17 @@ import { Trash2, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ExpenseItem from "./ExpenseItem";
 import AddItemForm from "./AddItemForm";
-import type { DayExpense } from "@/types/expense";
+import type { DayExpense, Category } from "@/types/expense";
 
 interface DayCardProps {
   dayExpense: DayExpense;
-  onAddItem: (dayId: string, name: string, amount: number) => void;
+  categories: Category[];
+  onAddItem: (dayId: string, name: string, amount: number, categoryId?: string) => void;
   onDeleteItem: (dayId: string, itemId: string) => void;
   onDeleteDay: (dayId: string) => void;
 }
 
-const DayCard = ({ dayExpense, onAddItem, onDeleteItem, onDeleteDay }: DayCardProps) => {
+const DayCard = ({ dayExpense, categories, onAddItem, onDeleteItem, onDeleteDay }: DayCardProps) => {
   const total = dayExpense.items.reduce((sum, item) => sum + item.amount, 0);
 
   return (
@@ -41,6 +42,7 @@ const DayCard = ({ dayExpense, onAddItem, onDeleteItem, onDeleteDay }: DayCardPr
           <ExpenseItem
             key={item.id}
             item={item}
+            category={categories.find((c) => c.id === item.categoryId)}
             onDelete={(itemId) => onDeleteItem(dayExpense.id, itemId)}
           />
         ))}
@@ -50,7 +52,10 @@ const DayCard = ({ dayExpense, onAddItem, onDeleteItem, onDeleteDay }: DayCardPr
         <p className="text-muted-foreground text-center py-4">এখনো কোনো আইটেম যোগ হয়নি</p>
       )}
 
-      <AddItemForm onAdd={(name, amount) => onAddItem(dayExpense.id, name, amount)} />
+      <AddItemForm
+        categories={categories}
+        onAdd={(name, amount, categoryId) => onAddItem(dayExpense.id, name, amount, categoryId)}
+      />
     </div>
   );
 };

@@ -1,16 +1,28 @@
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { ExpenseItem as ExpenseItemType } from "@/types/expense";
+import type { ExpenseItem as ExpenseItemType, Category } from "@/types/expense";
 
 interface ExpenseItemProps {
   item: ExpenseItemType;
+  category?: Category;
   onDelete: (id: string) => void;
 }
 
-const ExpenseItem = ({ item, onDelete }: ExpenseItemProps) => {
+const ExpenseItem = ({ item, category, onDelete }: ExpenseItemProps) => {
   return (
     <div className="item-row group animate-slide-in">
-      <span className="text-foreground font-medium">{item.name}</span>
+      <div className="flex items-center gap-2">
+        {category && (
+          <span
+            className="w-2.5 h-2.5 rounded-full shrink-0"
+            style={{ backgroundColor: category.color }}
+          />
+        )}
+        <span className="text-foreground font-medium">{item.name}</span>
+        {category && (
+          <span className="text-xs text-muted-foreground">({category.name})</span>
+        )}
+      </div>
       <div className="flex items-center gap-3">
         <span className="text-primary font-semibold">৳{item.amount}</span>
         <Button
