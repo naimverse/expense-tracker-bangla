@@ -1,5 +1,6 @@
 import { TrendingUp, Calendar, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLang } from "@/contexts/LanguageContext";
 import type { DayExpense } from "@/types/expense";
 
 interface MonthlySummaryProps {
@@ -8,11 +9,6 @@ interface MonthlySummaryProps {
   onSelectMonth: (monthKey: string | null) => void;
 }
 
-const bengaliMonths = [
-  "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
-  "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"
-];
-
 export const parseDate = (dateStr: string): { month: number; year: string } | null => {
   const parts = dateStr.split(".");
   if (parts.length >= 2) {
@@ -20,10 +16,10 @@ export const parseDate = (dateStr: string): { month: number; year: string } | nu
       const bengaliNumerals = "০১২৩৪৫৬৭৮৯";
       return str.replace(/[০-৯]/g, (d) => bengaliNumerals.indexOf(d).toString());
     };
-    
+
     const month = parseInt(bengaliToEnglish(parts[1])) - 1;
     const year = parts[2] ? bengaliToEnglish(parts[2]) : "26";
-    
+
     if (month >= 0 && month < 12) {
       return { month, year };
     }
@@ -37,20 +33,16 @@ export const getMonthKey = (dateStr: string): string | null => {
 };
 
 const MonthlySummary = ({ expenses, selectedMonth, onSelectMonth }: MonthlySummaryProps) => {
+  const { t, fmtNum, monthName } = useLang();
+
   const monthlyData = expenses.reduce((acc, day) => {
     const parsed = parseDate(day.date);
     if (parsed) {
       const key = `${parsed.month}-${parsed.year}`;
       const dayTotal = day.items.reduce((sum, item) => sum + item.amount, 0);
-      
+
       if (!acc[key]) {
-        acc[key] = {
-          key,
-          month: parsed.month,
-          year: parsed.year,
-          total: 0,
-          daysCount: 0,
-        };
+        acc[key] = { key, month: parsed.month, year: parsed.year, total: 0, daysCount: 0 };
       }
       acc[key].total += dayTotal;
       acc[key].daysCount += 1;
@@ -63,9 +55,7 @@ const MonthlySummary = ({ expenses, selectedMonth, onSelectMonth }: MonthlySumma
     return b.month - a.month;
   });
 
-  if (sortedMonths.length === 0) {
-    return null;
-  }
+  if (sortedMonths.length === 0) return null;
 
   const maxTotal = Math.max(...sortedMonths.map((m) => m.total));
 
@@ -74,7 +64,7 @@ const MonthlySummary = ({ expenses, selectedMonth, onSelectMonth }: MonthlySumma
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-secondary" />
-          <h2 className="text-lg font-semibold text-foreground">মাসিক খরচ</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t("monthlyExpense")}</h2>
         </div>
         {selectedMonth && (
           <Button
@@ -84,7 +74,7 @@ const MonthlySummary = ({ expenses, selectedMonth, onSelectMonth }: MonthlySumma
             className="text-muted-foreground hover:text-foreground gap-1"
           >
             <X className="h-4 w-4" />
-            ফিল্টার বাদ দিন
+            {t("clearFilter")}
           </Button>
         )}
       </div>
@@ -93,14 +83,12 @@ const MonthlySummary = ({ expenses, selectedMonth, onSelectMonth }: MonthlySumma
         {sortedMonths.map((data) => {
           const percentage = (data.total / maxTotal) * 100;
           const isSelected = selectedMonth === data.key;
-          
+
           return (
-            <div 
-              key={data.key} 
+            <div
+              key={data.key}
               className={`animate-slide-in p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                isSelected 
-                  ? "bg-primary/10 ring-2 ring-primary" 
-                  : "hover:bg-muted"
+                isSelected ? "bg-primary/10 ring-2 ring-primary" : "hover:bg-muted"
               }`}
               onClick={() => onSelectMonth(isSelected ? null : data.key)}
             >
@@ -108,13 +96,13 @@ const MonthlySummary = ({ expenses, selectedMonth, onSelectMonth }: MonthlySumma
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className={`font-medium ${isSelected ? "text-primary" : "text-foreground"}`}>
-                    {bengaliMonths[data.month]} '{data.year}
+                    {monthName(data.month)} '{fmtNum(data.year)}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    ({data.daysCount} দিন)
+                    ({t("daysCount", { n: fmtNum(data.daysCount) })})
                   </span>
                 </div>
-                <span className="font-bold text-primary">৳{data.total}</span>
+                <span className="font-bold text-primary">{t("currency")}{fmtNum(data.total)}</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div

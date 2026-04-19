@@ -2,6 +2,7 @@ import { Trash2, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ExpenseItem from "./ExpenseItem";
 import AddItemForm from "./AddItemForm";
+import { useLang } from "@/contexts/LanguageContext";
 import type { DayExpense, Category } from "@/types/expense";
 
 interface DayCardProps {
@@ -14,6 +15,7 @@ interface DayCardProps {
 
 const DayCard = ({ dayExpense, categories, onAddItem, onDeleteItem, onDeleteDay }: DayCardProps) => {
   const total = dayExpense.items.reduce((sum, item) => sum + item.amount, 0);
+  const { t, fmtNum } = useLang();
 
   return (
     <div className="date-card p-5 animate-fade-in">
@@ -24,7 +26,7 @@ const DayCard = ({ dayExpense, categories, onAddItem, onDeleteItem, onDeleteDay 
         </div>
         <div className="flex items-center gap-3">
           <div className="total-badge">
-            মোট: ৳{total}
+            {t("dayTotal")}: {t("currency")}{fmtNum(total)}
           </div>
           <Button
             variant="ghost"
@@ -49,7 +51,7 @@ const DayCard = ({ dayExpense, categories, onAddItem, onDeleteItem, onDeleteDay 
       </div>
 
       {dayExpense.items.length === 0 && (
-        <p className="text-muted-foreground text-center py-4">এখনো কোনো আইটেম যোগ হয়নি</p>
+        <p className="text-muted-foreground text-center py-4">{t("noItemsYet")}</p>
       )}
 
       <AddItemForm

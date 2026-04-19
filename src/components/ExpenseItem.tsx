@@ -1,5 +1,6 @@
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLang } from "@/contexts/LanguageContext";
 import type { ExpenseItem as ExpenseItemType, Category } from "@/types/expense";
 
 interface ExpenseItemProps {
@@ -9,6 +10,7 @@ interface ExpenseItemProps {
 }
 
 const ExpenseItem = ({ item, category, onDelete }: ExpenseItemProps) => {
+  const { t, fmtNum } = useLang();
   return (
     <div className="item-row group animate-slide-in">
       <div className="flex items-center gap-2">
@@ -24,7 +26,7 @@ const ExpenseItem = ({ item, category, onDelete }: ExpenseItemProps) => {
         )}
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-primary font-semibold">৳{item.amount}</span>
+        <span className="text-primary font-semibold">{t("currency")}{fmtNum(item.amount)}</span>
         <Button
           variant="ghost"
           size="icon"

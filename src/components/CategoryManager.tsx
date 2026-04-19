@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Tags, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useLang } from "@/contexts/LanguageContext";
 import type { Category } from "@/types/expense";
 
 interface CategoryManagerProps {
@@ -13,6 +14,7 @@ interface CategoryManagerProps {
 const CategoryManager = ({ categories, onAdd, onDelete }: CategoryManagerProps) => {
   const [name, setName] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const { t, fmtNum } = useLang();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,9 +31,9 @@ const CategoryManager = ({ categories, onAdd, onDelete }: CategoryManagerProps) 
         className="flex items-center gap-2 w-full text-left"
       >
         <Tags className="h-5 w-5 text-primary" />
-        <h2 className="text-lg font-semibold text-foreground">ক্যাটাগরি</h2>
+        <h2 className="text-lg font-semibold text-foreground">{t("categoriesTitle")}</h2>
         <span className="text-sm text-muted-foreground ml-auto">
-          {categories.length}টি
+          {t("categoriesCount", { n: fmtNum(categories.length) })}
         </span>
       </button>
 
@@ -61,7 +63,7 @@ const CategoryManager = ({ categories, onAdd, onDelete }: CategoryManagerProps) 
           <form onSubmit={handleSubmit} className="flex gap-2">
             <Input
               type="text"
-              placeholder="নতুন ক্যাটাগরি"
+              placeholder={t("newCategoryPlaceholder")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="input-field flex-1"

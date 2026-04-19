@@ -5,10 +5,12 @@ import AddDateForm from "@/components/AddDateForm";
 import MonthlySummary, { getMonthKey } from "@/components/MonthlySummary";
 import CategoryManager from "@/components/CategoryManager";
 import { useExpenses } from "@/hooks/useExpenses";
+import { useLang } from "@/contexts/LanguageContext";
 
 const Index = () => {
   const { expenses, categories, grandTotal, addDate, deleteDate, addItem, deleteItem, addCategory, deleteCategory } = useExpenses();
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const { t, fmtNum } = useLang();
 
   const filteredExpenses = selectedMonth
     ? expenses.filter((day) => getMonthKey(day.date) === selectedMonth)
@@ -22,7 +24,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header grandTotal={selectedMonth ? filteredTotal : grandTotal} />
-      
+
       <main className="container max-w-2xl mx-auto px-4 py-6">
         <AddDateForm onAdd={addDate} />
 
@@ -31,19 +33,19 @@ const Index = () => {
           onAdd={addCategory}
           onDelete={deleteCategory}
         />
-        
-        <MonthlySummary 
-          expenses={expenses} 
+
+        <MonthlySummary
+          expenses={expenses}
           selectedMonth={selectedMonth}
           onSelectMonth={setSelectedMonth}
         />
-        
+
         {selectedMonth && (
           <p className="text-sm text-muted-foreground mb-4 text-center">
-            {filteredExpenses.length} দিনের খরচ দেখাচ্ছে
+            {t("showingDays", { n: fmtNum(filteredExpenses.length) })}
           </p>
         )}
-        
+
         <div className="space-y-4">
           {filteredExpenses.map((dayExpense) => (
             <DayCard
@@ -60,9 +62,9 @@ const Index = () => {
         {filteredExpenses.length === 0 && (
           <div className="text-center py-16">
             <p className="text-muted-foreground text-lg">
-              {selectedMonth ? "এই মাসে কোনো খরচ নেই" : "কোনো খরচ নেই"}
+              {selectedMonth ? t("noExpensesMonth") : t("noExpenses")}
             </p>
-            <p className="text-muted-foreground">উপরে তারিখ যোগ করে শুরু করুন</p>
+            <p className="text-muted-foreground">{t("addDateToStart")}</p>
           </div>
         )}
       </main>

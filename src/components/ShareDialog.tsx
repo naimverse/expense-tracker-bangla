@@ -11,11 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useWorkspace } from "@/contexts/WorkspaceContext";
+import { useLang } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 
 const ShareDialog = () => {
   const { workspaces, activeOwnerUid, switchWorkspace, members, inviteMember, removeMember, isOwner } =
     useWorkspace();
+  const { t, fmtNum } = useLang();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -24,10 +26,10 @@ const ShareDialog = () => {
     setSubmitting(true);
     try {
       await inviteMember(email);
-      toast.success(`${email} কে যোগ করা হয়েছে`);
+      toast.success(t("inviteSuccess", { email }));
       setEmail("");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "যোগ করতে ব্যর্থ";
+      const msg = err instanceof Error ? err.message : t("inviteFailed");
       toast.error(msg);
     } finally {
       setSubmitting(false);
@@ -37,9 +39,9 @@ const ShareDialog = () => {
   const handleRemove = async (memberEmail: string) => {
     try {
       await removeMember(memberEmail);
-      toast.success("সদস্য সরানো হয়েছে");
+      toast.success(t("memberRemoved"));
     } catch {
-      toast.error("সরাতে ব্যর্থ");
+      toast.error(t("removeFailed"));
     }
   };
 
@@ -50,23 +52,20 @@ const ShareDialog = () => {
           variant="ghost"
           size="icon"
           className="text-muted-foreground hover:text-primary"
-          title="শেয়ার করুন"
+          title={t("share")}
         >
           <Users className="h-5 w-5" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>ওয়ার্কস্পেস ও শেয়ার</DialogTitle>
-          <DialogDescription>
-            পরিবারের সদস্যদের ইমেইল দিয়ে যোগ করুন — তারা আপনার তালিকায় খরচ যোগ ও মুছতে পারবেন।
-          </DialogDescription>
+          <DialogTitle>{t("shareTitle")}</DialogTitle>
+          <DialogDescription>{t("shareDesc")}</DialogDescription>
         </DialogHeader>
 
-        {/* Workspace switcher */}
         {workspaces.length > 1 && (
           <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">ওয়ার্কস্পেস বাছুন</p>
+            <p className="text-sm font-medium text-foreground">{t("pickWorkspace")}</p>
             <div className="space-y-1.5">
               {workspaces.map((w) => {
                 const active = w.ownerUid === activeOwnerUid;
@@ -75,9 +74,7 @@ const ShareDialog = () => {
                     key={w.ownerUid}
                     onClick={() => switchWorkspace(w.ownerUid)}
                     className={`w-full flex items-center justify-between p-3 rounded-lg border transition-colors text-left ${
-                      active
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:bg-muted"
+                      active ? "border-primary bg-primary/5" : "border-border hover:bg-muted"
                     }`}
                   >
                     <div className="min-w-0">
@@ -92,11 +89,10 @@ const ShareDialog = () => {
           </div>
         )}
 
-        {/* Invite form (only owner) */}
         {isOwner && (
           <>
             <form onSubmit={handleInvite} className="space-y-2">
-              <p className="text-sm font-medium text-foreground">নতুন সদস্য যোগ করুন</p>
+              <p className="text-sm font-medium text-foreground">{t("addNewMember")}</p>
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -111,16 +107,15 @@ const ShareDialog = () => {
                 </div>
                 <Button type="submit" disabled={submitting} className="add-button gap-1">
                   <UserPlus className="h-4 w-4" />
-                  যোগ
+                  {t("add")}
                 </Button>
               </div>
             </form>
 
-            {/* Members list */}
             {members.length > 0 && (
               <div className="space-y-2">
                 <p className="text-sm font-medium text-foreground">
-                  সদস্যবৃন্দ ({members.length})
+                  {t("members", { n: fmtNum(members.length) })}
                 </p>
                 <div className="space-y-1.5 max-h-48 overflow-y-auto">
                   {members.map((m) => (
@@ -146,9 +141,7 @@ const ShareDialog = () => {
         )}
 
         {!isOwner && (
-          <p className="text-sm text-muted-foreground text-center py-2">
-            আপনি একজন সদস্য হিসেবে এই ওয়ার্কস্পেস ব্যবহার করছেন।
-          </p>
+          <p className="text-sm text-muted-foreground text-center py-2">{t("youAreMember")}</p>
         )}
       </DialogContent>
     </Dialog>

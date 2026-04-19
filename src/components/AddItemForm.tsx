@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLang } from "@/contexts/LanguageContext";
 import type { Category } from "@/types/expense";
 
 interface AddItemFormProps {
@@ -14,6 +15,7 @@ const AddItemForm = ({ onAdd, categories }: AddItemFormProps) => {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
+  const { t } = useLang();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,14 +31,14 @@ const AddItemForm = ({ onAdd, categories }: AddItemFormProps) => {
       <div className="flex gap-2">
         <Input
           type="text"
-          placeholder="আইটেমের নাম"
+          placeholder={t("itemNamePlaceholder")}
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="input-field flex-1"
         />
         <Input
           type="number"
-          placeholder="টাকা"
+          placeholder={t("amountPlaceholder")}
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className="input-field w-24"
@@ -45,7 +47,7 @@ const AddItemForm = ({ onAdd, categories }: AddItemFormProps) => {
       <div className="flex gap-2">
         <Select value={categoryId} onValueChange={setCategoryId}>
           <SelectTrigger className="flex-1 input-field">
-            <SelectValue placeholder="ক্যাটাগরি বাছুন" />
+            <SelectValue placeholder={t("pickCategory")} />
           </SelectTrigger>
           <SelectContent>
             {categories.map((cat) => (
