@@ -39,7 +39,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const toggle = () => setLangState((p) => (p === "bn" ? "en" : "bn"));
 
   const t = (key: TranslationKey, vars?: Record<string, string | number>) => {
-    let s = translations[lang][key] || translations.bn[key] || key;
+    let s: string = (translations[lang] as Record<string, string>)[key] ?? (translations.bn as Record<string, string>)[key] ?? key;
     if (vars) {
       Object.entries(vars).forEach(([k, v]) => {
         s = s.replace(`{${k}}`, String(v));
