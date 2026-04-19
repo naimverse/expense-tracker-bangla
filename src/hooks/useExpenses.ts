@@ -1,125 +1,150 @@
 import { useState, useEffect } from "react";
+import {
+  collection,
+  doc,
+  onSnapshot,
+  setDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  writeBatch,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useAuth } from "@/contexts/AuthContext";
 import type { DayExpense, ExpenseItem, Category } from "@/types/expense";
-
-const STORAGE_KEY = "bazar-expenses";
-const CATEGORY_KEY = "bazar-categories";
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
-const defaultCategories: Category[] = [
-  { id: "cat-1", name: "পরিবহন", color: "hsl(28, 85%, 55%)" },
-  { id: "cat-2", name: "সবজি", color: "hsl(145, 45%, 42%)" },
-  { id: "cat-3", name: "মশলা", color: "hsl(0, 84%, 60%)" },
-  { id: "cat-4", name: "তেল/ঘি", color: "hsl(45, 80%, 50%)" },
-  { id: "cat-5", name: "ফল", color: "hsl(280, 60%, 55%)" },
-  { id: "cat-6", name: "অন্যান্য", color: "hsl(200, 50%, 50%)" },
-];
-
-const initialData: DayExpense[] = [
-  {
-    id: generateId(),
-    date: "১.২.২৬",
-    items: [{ id: generateId(), name: "ভাড়া", amount: 90, categoryId: "cat-1" }],
-  },
-  {
-    id: generateId(),
-    date: "২.২.২৬",
-    items: [
-      { id: generateId(), name: "আলু", amount: 40, categoryId: "cat-2" },
-      { id: generateId(), name: "রসুন", amount: 50, categoryId: "cat-3" },
-      { id: generateId(), name: "পিঁয়াজ", amount: 100, categoryId: "cat-3" },
-      { id: generateId(), name: "আদা", amount: 100, categoryId: "cat-3" },
-      { id: generateId(), name: "সরিষার তেল", amount: 140, categoryId: "cat-4" },
-    ],
-  },
-  {
-    id: generateId(),
-    date: "৩.২.২৬",
-    items: [
-      { id: generateId(), name: "ভাড়া", amount: 90, categoryId: "cat-1" },
-      { id: generateId(), name: "কুল", amount: 30, categoryId: "cat-5" },
-      { id: generateId(), name: "বেগুন", amount: 50, categoryId: "cat-2" },
-    ],
-  },
-  {
-    id: generateId(),
-    date: "৪.২.২৬",
-    items: [
-      { id: generateId(), name: "ভাড়া", amount: 90, categoryId: "cat-1" },
-      { id: generateId(), name: "ডাল ভাজা", amount: 20, categoryId: "cat-6" },
-    ],
-  },
+const defaultCategories: Omit<Category, "id">[] = [
+  { name: "পরিবহন", color: "hsl(28, 85%, 55%)" },
+  { name: "সবজি", color: "hsl(145, 45%, 42%)" },
+  { name: "মশলা", color: "hsl(0, 84%, 60%)" },
+  { name: "তেল/ঘি", color: "hsl(45, 80%, 50%)" },
+  { name: "ফল", color: "hsl(280, 60%, 55%)" },
+  { name: "অন্যান্য", color: "hsl(200, 50%, 50%)" },
 ];
 
 export const useExpenses = () => {
-  const [expenses, setExpenses] = useState<DayExpense[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : initialData;
-  });
+  const { user } = useAuth();
+  const [expenses, setExpenses] = useState<DayExpense[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [categories, setCategories] = useState<Category[]>(() => {
-    const saved = localStorage.getItem(CATEGORY_KEY);
-    return saved ? JSON.parse(saved) : defaultCategories;
-  });
-
+  // Subscribe to expenses
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
-  }, [expenses]);
+    if (!user) {
+      setExpenses([]);
+      setLoading(false);
+      return;
+    }
 
+    const expensesRef = collection(db, "users", user.uid, "expenses");
+    const q = query(expensesRef, orderBy("createdAt", "desc"));
+
+    const unsub = onSnapshot(q, (snap) => {
+      const data: DayExpense[] = snap.docs.map((d) => {
+        const raw = d.data() as { date: string; items?: ExpenseItem[] };
+        return {
+          id: d.id,
+          date: raw.date,
+          items: raw.items || [],
+        };
+      });
+      setExpenses(data);
+      setLoading(false);
+    });
+
+    return () => unsub();
+  }, [user]);
+
+  // Subscribe to categories (seed defaults if empty)
   useEffect(() => {
-    localStorage.setItem(CATEGORY_KEY, JSON.stringify(categories));
-  }, [categories]);
+    if (!user) {
+      setCategories([]);
+      return;
+    }
 
-  const addDate = (date: string) => {
-    const newDay: DayExpense = {
-      id: generateId(),
+    const catsRef = collection(db, "users", user.uid, "categories");
+
+    const unsub = onSnapshot(catsRef, async (snap) => {
+      if (snap.empty) {
+        // Seed defaults
+        const batch = writeBatch(db);
+        defaultCategories.forEach((c) => {
+          const id = generateId();
+          batch.set(doc(catsRef, id), c);
+        });
+        await batch.commit();
+        return;
+      }
+      const data: Category[] = snap.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<Category, "id">),
+      }));
+      setCategories(data);
+    });
+
+    return () => unsub();
+  }, [user]);
+
+  const addDate = async (date: string) => {
+    if (!user) return;
+    const id = generateId();
+    await setDoc(doc(db, "users", user.uid, "expenses", id), {
       date,
       items: [],
-    };
-    setExpenses((prev) => [newDay, ...prev]);
+      createdAt: Date.now(),
+    });
   };
 
-  const deleteDate = (dayId: string) => {
-    setExpenses((prev) => prev.filter((day) => day.id !== dayId));
+  const deleteDate = async (dayId: string) => {
+    if (!user) return;
+    await deleteDoc(doc(db, "users", user.uid, "expenses", dayId));
   };
 
-  const addItem = (dayId: string, name: string, amount: number, categoryId?: string) => {
-    const newItem: ExpenseItem = {
-      id: generateId(),
-      name,
-      amount,
-      categoryId,
-    };
-    setExpenses((prev) =>
-      prev.map((day) =>
-        day.id === dayId ? { ...day, items: [...day.items, newItem] } : day
-      )
+  const addItem = async (
+    dayId: string,
+    name: string,
+    amount: number,
+    categoryId?: string
+  ) => {
+    if (!user) return;
+    const day = expenses.find((d) => d.id === dayId);
+    if (!day) return;
+    const newItem: ExpenseItem = { id: generateId(), name, amount, categoryId };
+    await setDoc(
+      doc(db, "users", user.uid, "expenses", dayId),
+      { items: [...day.items, newItem] },
+      { merge: true }
     );
   };
 
-  const deleteItem = (dayId: string, itemId: string) => {
-    setExpenses((prev) =>
-      prev.map((day) =>
-        day.id === dayId
-          ? { ...day, items: day.items.filter((item) => item.id !== itemId) }
-          : day
-      )
+  const deleteItem = async (dayId: string, itemId: string) => {
+    if (!user) return;
+    const day = expenses.find((d) => d.id === dayId);
+    if (!day) return;
+    await setDoc(
+      doc(db, "users", user.uid, "expenses", dayId),
+      { items: day.items.filter((i) => i.id !== itemId) },
+      { merge: true }
     );
   };
 
-  const addCategory = (name: string) => {
+  const addCategory = async (name: string) => {
+    if (!user) return;
     const hue = Math.floor(Math.random() * 360);
-    const newCat: Category = {
-      id: generateId(),
-      name,
-      color: `hsl(${hue}, 60%, 50%)`,
-    };
-    setCategories((prev) => [...prev, newCat]);
+    const id = generateId();
+    const newCat: Category = { id, name, color: `hsl(${hue}, 60%, 50%)` };
+    await setDoc(doc(db, "users", user.uid, "categories", id), {
+      name: newCat.name,
+      color: newCat.color,
+    });
     return newCat;
   };
 
-  const deleteCategory = (catId: string) => {
-    setCategories((prev) => prev.filter((c) => c.id !== catId));
+  const deleteCategory = async (catId: string) => {
+    if (!user) return;
+    await deleteDoc(doc(db, "users", user.uid, "categories", catId));
   };
 
   const grandTotal = expenses.reduce(
@@ -131,6 +156,7 @@ export const useExpenses = () => {
     expenses,
     categories,
     grandTotal,
+    loading,
     addDate,
     deleteDate,
     addItem,
