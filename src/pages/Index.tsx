@@ -8,13 +8,24 @@ import { useExpenses } from "@/hooks/useExpenses";
 import { useLang } from "@/contexts/LanguageContext";
 
 const Index = () => {
-  const { expenses, categories, grandTotal, addDate, deleteDate, addItem, deleteItem, addCategory, deleteCategory } = useExpenses();
+  const { expenses, categories, grandTotal, addDate, deleteDate, addItem, editItem, deleteItem, addCategory, deleteCategory } = useExpenses();
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const { t, fmtNum } = useLang();
 
-  const filteredExpenses = selectedMonth
+  const bnToEn = (s: string) => s.replace(/[০-৯]/g, (d) => "০১২৩৪৫৬৭৮৯".indexOf(d).toString());
+  const dateSortKey = (dateStr: string) => {
+    const parts = bnToEn(dateStr).split(".").map((p) => parseInt(p));
+    if (parts.length < 2 || parts.some(isNaN)) return 0;
+    const [day, month, year = 0] = parts;
+    return year * 10000 + month * 100 + day;
+  };
+
+  const filteredExpenses = (selectedMonth
     ? expenses.filter((day) => getMonthKey(day.date) === selectedMonth)
-    : expenses;
+    : expenses
+  )
+    .slice()
+    .sort((a, b) => dateSortKey(a.date) - dateSortKey(b.date));
 
   const filteredTotal = filteredExpenses.reduce(
     (total, day) => total + day.items.reduce((sum, item) => sum + item.amount, 0),
@@ -53,6 +64,7 @@ const Index = () => {
               dayExpense={dayExpense}
               categories={categories}
               onAddItem={addItem}
+              onEditItem={editItem}
               onDeleteItem={deleteItem}
               onDeleteDay={deleteDate}
             />
