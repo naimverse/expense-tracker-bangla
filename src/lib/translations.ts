@@ -255,6 +255,22 @@ export const translations = {
 
     currency: "৳",
 
+    homeFeatBudgetTitle: "Per-category budgets",
+    homeFeatBudgetDesc: "Set a budget for each category every month — see right away when you go over the limit.",
+    homeFeatIncomeTitle: "Monthly income tracking",
+    homeFeatIncomeDesc: "Add income from multiple sources — salary, freelance, business — all in one place.",
+    homeFeatOverviewTitle: "Monthly overview",
+    homeFeatOverviewDesc: "Income vs expense, budget status and category breakdown — everything on one page.",
+    homeFeatDateTitle: "Calendar date picker",
+    homeFeatDateDesc: "No more typing dates — just pick from a clean calendar.",
+    homeFeatWorkspaceTitle: "Multi-workspace",
+    homeFeatWorkspaceDesc: "Switch between your own and shared workspaces with a single click.",
+
+    homePreviewBudget: "Budget: 3,200 of 4,000 used",
+    homePreviewIncome: "April income: 50,000",
+    homePreviewBalance: "Remaining: 15,500",
+    withinBudgetShort: "within budget",
+
     language: "Language",
     bengali: "বাংলা",
     english: "English",
