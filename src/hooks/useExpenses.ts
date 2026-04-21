@@ -165,6 +165,27 @@ export const useExpenses = () => {
     );
   };
 
+  const editItem = async (
+    dayId: string,
+    itemId: string,
+    name: string,
+    amount: number,
+    categoryId?: string
+  ) => {
+    if (!ownerUid) return;
+    const day = expenses.find((d) => d.id === dayId);
+    if (!day) return;
+    await setDoc(
+      doc(db, "users", ownerUid, "expenses", dayId),
+      {
+        items: day.items.map((i) =>
+          i.id === itemId ? { ...i, name, amount, categoryId } : i
+        ),
+      },
+      { merge: true }
+    );
+  };
+
   const deleteItem = async (dayId: string, itemId: string) => {
     if (!ownerUid) return;
     const day = expenses.find((d) => d.id === dayId);
@@ -258,6 +279,7 @@ export const useExpenses = () => {
     addDate,
     deleteDate,
     addItem,
+    editItem,
     deleteItem,
     addCategory,
     deleteCategory,

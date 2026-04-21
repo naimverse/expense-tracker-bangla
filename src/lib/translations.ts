@@ -13,6 +13,13 @@ export const translations = {
     save: "সংরক্ষণ",
     cancel: "বাতিল",
     delete: "মুছুন",
+    edit: "এডিট",
+    confirm: "নিশ্চিত করুন",
+    confirmDeleteTitle: "আপনি কি নিশ্চিত?",
+    confirmDeleteDayDesc: "এই তারিখের সব আইটেম মুছে যাবে। এই কাজ ফিরিয়ে আনা যাবে না।",
+    confirmDeleteItemDesc: "এই আইটেমটি স্থায়ীভাবে মুছে যাবে।",
+    confirmDeleteIncomeDesc: "এই আয়ের এন্ট্রি স্থায়ীভাবে মুছে যাবে।",
+    editItemTitle: "আইটেম এডিট করুন",
 
     // Home page
     homeBadge: "একসাথে পরিবারের বাজেট ম্যানেজ করুন",
@@ -157,6 +164,13 @@ export const translations = {
     save: "Save",
     cancel: "Cancel",
     delete: "Delete",
+    edit: "Edit",
+    confirm: "Confirm",
+    confirmDeleteTitle: "Are you sure?",
+    confirmDeleteDayDesc: "All items for this date will be deleted. This action cannot be undone.",
+    confirmDeleteItemDesc: "This item will be permanently deleted.",
+    confirmDeleteIncomeDesc: "This income entry will be permanently deleted.",
+    editItemTitle: "Edit item",
 
     homeBadge: "Manage your family budget together",
     homeHero1: "Track your daily market expenses",
