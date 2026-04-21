@@ -122,6 +122,23 @@ export const translations = {
     // Currency
     currency: "৳",
 
+    // Home — extended features
+    homeFeatBudgetTitle: "ক্যাটাগরি ভিত্তিক বাজেট",
+    homeFeatBudgetDesc: "প্রতি মাসে প্রতিটি ক্যাটাগরির জন্য বাজেট সেট করুন — সীমা ছাড়ালে সাথে সাথে দেখতে পাবেন।",
+    homeFeatIncomeTitle: "মাসিক আয় ট্র্যাকিং",
+    homeFeatIncomeDesc: "একাধিক উৎস থেকে আয় যোগ করুন — বেতন, ফ্রিল্যান্স, ব্যবসা — সব এক জায়গায়।",
+    homeFeatOverviewTitle: "মাসিক ওভারভিউ",
+    homeFeatOverviewDesc: "আয় বনাম খরচ, বাজেট স্ট্যাটাস ও ক্যাটাগরি অনুযায়ী ব্রেকডাউন — এক পেজে সব।",
+    homeFeatDateTitle: "ক্যালেন্ডার ডেট পিকার",
+    homeFeatDateDesc: "তারিখ লেখার ঝামেলা নেই — ক্যালেন্ডার থেকে সহজেই বাছুন।",
+    homeFeatWorkspaceTitle: "মাল্টি-ওয়ার্কস্পেস",
+    homeFeatWorkspaceDesc: "নিজের ও শেয়ারড ওয়ার্কস্পেসের মধ্যে এক ক্লিকে সুইচ করুন।",
+
+    homePreviewBudget: "বাজেট: ৪,০০০ এর মধ্যে ৩,২০০ ব্যবহৃত",
+    homePreviewIncome: "এপ্রিল আয়: ৫০,০০০",
+    homePreviewBalance: "অবশিষ্ট: ১৫,৫০০",
+    withinBudgetShort: "সীমার মধ্যে",
+
     // Language
     language: "ভাষা",
     bengali: "বাংলা",
@@ -237,6 +254,22 @@ export const translations = {
     noCategoriesYet: "No categories yet",
 
     currency: "৳",
+
+    homeFeatBudgetTitle: "Per-category budgets",
+    homeFeatBudgetDesc: "Set a budget for each category every month — see right away when you go over the limit.",
+    homeFeatIncomeTitle: "Monthly income tracking",
+    homeFeatIncomeDesc: "Add income from multiple sources — salary, freelance, business — all in one place.",
+    homeFeatOverviewTitle: "Monthly overview",
+    homeFeatOverviewDesc: "Income vs expense, budget status and category breakdown — everything on one page.",
+    homeFeatDateTitle: "Calendar date picker",
+    homeFeatDateDesc: "No more typing dates — just pick from a clean calendar.",
+    homeFeatWorkspaceTitle: "Multi-workspace",
+    homeFeatWorkspaceDesc: "Switch between your own and shared workspaces with a single click.",
+
+    homePreviewBudget: "Budget: 3,200 of 4,000 used",
+    homePreviewIncome: "April income: 50,000",
+    homePreviewBalance: "Remaining: 15,500",
+    withinBudgetShort: "within budget",
 
     language: "Language",
     bengali: "বাংলা",

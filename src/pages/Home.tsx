@@ -1,5 +1,5 @@
 import { Navigate, Link } from "react-router-dom";
-import { ShoppingBasket, Users, BarChart3, CloudCog, Sparkles, ShieldCheck, ArrowRight } from "lucide-react";
+import { ShoppingBasket, Users, BarChart3, CloudCog, Sparkles, ShieldCheck, ArrowRight, Target, Wallet, LayoutDashboard, CalendarDays, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LanguageContext";
@@ -76,25 +76,64 @@ const Home = () => {
           <div className="date-card p-6 text-left shadow-lg">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <ShoppingBasket className="h-5 w-5 text-primary" />
-                <span className="font-semibold text-foreground">{t("sampleDate")}</span>
+                <Target className="h-5 w-5 text-primary" />
+                <span className="font-semibold text-foreground">{t("overview")}</span>
               </div>
-              <span className="total-badge">{t("totalLabel")}: {t("currency")}{fmtNum(850)}</span>
+              <span className="total-badge">{t("homePreviewIncome")}</span>
             </div>
-            <div className="space-y-2">
+
+            <div className="grid sm:grid-cols-3 gap-3 mb-5">
+              <div className="rounded-lg bg-success/10 p-3">
+                <p className="text-xs text-muted-foreground">{t("totalIncome")}</p>
+                <p className="font-bold text-foreground">{t("currency")}{fmtNum(50000)}</p>
+              </div>
+              <div className="rounded-lg bg-secondary/10 p-3">
+                <p className="text-xs text-muted-foreground">{t("totalExpense")}</p>
+                <p className="font-bold text-foreground">{t("currency")}{fmtNum(34500)}</p>
+              </div>
+              <div className="rounded-lg bg-primary/10 p-3">
+                <p className="text-xs text-muted-foreground">{t("balance")}</p>
+                <p className="font-bold text-foreground">{t("currency")}{fmtNum(15500)}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
               {[
-                { name: t("catVeggies"), amount: 320, color: "hsl(145, 45%, 42%)" },
-                { name: t("catTransport"), amount: 450, color: "hsl(28, 85%, 55%)" },
-                { name: t("catOil"), amount: 80, color: "hsl(45, 80%, 50%)" },
-              ].map((i) => (
-                <div key={i.name} className="item-row">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full" style={{ backgroundColor: i.color }} />
-                    <span className="text-foreground">{i.name}</span>
+                { name: t("catVeggies"), spent: 3200, budget: 4000, color: "hsl(145, 45%, 42%)", ok: true },
+                { name: t("catTransport"), spent: 4800, budget: 4000, color: "hsl(28, 85%, 55%)", ok: false },
+                { name: t("catOil"), spent: 600, budget: 1500, color: "hsl(45, 80%, 50%)", ok: true },
+              ].map((i) => {
+                const pct = Math.min(100, Math.round((i.spent / i.budget) * 100));
+                return (
+                  <div key={i.name}>
+                    <div className="flex items-center justify-between text-sm mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: i.color }} />
+                        <span className="text-foreground font-medium">{i.name}</span>
+                        {i.ok ? (
+                          <span className="text-xs text-success flex items-center gap-1">
+                            <CheckCircle2 className="h-3 w-3" /> {t("withinBudgetShort")}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-destructive font-medium">{t("exceeded")}</span>
+                        )}
+                      </div>
+                      <span className="text-muted-foreground">
+                        {t("currency")}{fmtNum(i.spent)} / {t("currency")}{fmtNum(i.budget)}
+                      </span>
+                    </div>
+                    <div className="h-2 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{
+                          width: `${pct}%`,
+                          backgroundColor: i.ok ? i.color : "hsl(var(--destructive))",
+                        }}
+                      />
+                    </div>
                   </div>
-                  <span className="font-semibold text-foreground">{t("currency")}{fmtNum(i.amount)}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -103,11 +142,15 @@ const Home = () => {
       <section className="container max-w-6xl mx-auto px-4 py-16">
         <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-3">{t("featuresTitle")}</h2>
         <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto">{t("featuresSubtitle")}</p>
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {[
-            { icon: Users, title: t("featShareTitle"), desc: t("featShareDesc"), color: "text-primary", bg: "bg-primary/10" },
-            { icon: BarChart3, title: t("featDashTitle"), desc: t("featDashDesc"), color: "text-secondary", bg: "bg-secondary/10" },
-            { icon: CloudCog, title: t("featSyncTitle"), desc: t("featSyncDesc"), color: "text-success", bg: "bg-success/10" },
+            { icon: Target, title: t("homeFeatBudgetTitle"), desc: t("homeFeatBudgetDesc"), color: "text-primary", bg: "bg-primary/10" },
+            { icon: Wallet, title: t("homeFeatIncomeTitle"), desc: t("homeFeatIncomeDesc"), color: "text-success", bg: "bg-success/10" },
+            { icon: LayoutDashboard, title: t("homeFeatOverviewTitle"), desc: t("homeFeatOverviewDesc"), color: "text-secondary", bg: "bg-secondary/10" },
+            { icon: CalendarDays, title: t("homeFeatDateTitle"), desc: t("homeFeatDateDesc"), color: "text-primary", bg: "bg-primary/10" },
+            { icon: Users, title: t("featShareTitle"), desc: t("featShareDesc"), color: "text-secondary", bg: "bg-secondary/10" },
+            { icon: BarChart3, title: t("featDashTitle"), desc: t("featDashDesc"), color: "text-success", bg: "bg-success/10" },
+            { icon: CloudCog, title: t("featSyncTitle"), desc: t("featSyncDesc"), color: "text-primary", bg: "bg-primary/10" },
           ].map((f) => (
             <div key={f.title} className="date-card p-6">
               <div className={`${f.bg} w-12 h-12 rounded-xl flex items-center justify-center mb-4`}>
