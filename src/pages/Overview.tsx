@@ -455,6 +455,35 @@ const Overview = () => {
         </div>
       </main>
 
+      <Dialog open={!!editingIncomeId} onOpenChange={(o) => !o && setEditingIncomeId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("editIncomeTitle")}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSaveIncome} className="space-y-3">
+            <Input
+              value={editIncomeSource}
+              onChange={(e) => setEditIncomeSource(e.target.value)}
+              placeholder={t("incomeSourcePlaceholder")}
+              className="input-field"
+            />
+            <Input
+              type="number"
+              value={editIncomeAmount}
+              onChange={(e) => setEditIncomeAmount(e.target.value)}
+              placeholder={t("amountPlaceholder")}
+              className="input-field"
+            />
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setEditingIncomeId(null)}>
+                {t("cancel")}
+              </Button>
+              <Button type="submit" className="add-button">{t("save")}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       <AlertDialog
         open={!!pendingDeleteIncome}
         onOpenChange={(o) => !o && setPendingDeleteIncome(null)}
