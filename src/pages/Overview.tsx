@@ -7,6 +7,7 @@ import {
   TrendingUp,
   Plus,
   Trash2,
+  Pencil,
   AlertTriangle,
   CheckCircle2,
   Target,
