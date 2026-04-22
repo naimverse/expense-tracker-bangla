@@ -20,6 +20,7 @@ export const translations = {
     confirmDeleteItemDesc: "এই আইটেমটি স্থায়ীভাবে মুছে যাবে।",
     confirmDeleteIncomeDesc: "এই আয়ের এন্ট্রি স্থায়ীভাবে মুছে যাবে।",
     editItemTitle: "আইটেম এডিট করুন",
+    editIncomeTitle: "আয় এডিট করুন",
 
     // Home page
     homeBadge: "একসাথে পরিবারের বাজেট ম্যানেজ করুন",
@@ -171,6 +172,7 @@ export const translations = {
     confirmDeleteItemDesc: "This item will be permanently deleted.",
     confirmDeleteIncomeDesc: "This income entry will be permanently deleted.",
     editItemTitle: "Edit item",
+    editIncomeTitle: "Edit income",
 
     homeBadge: "Manage your family budget together",
     homeHero1: "Track your daily market expenses",

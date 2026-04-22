@@ -7,6 +7,7 @@ import {
   TrendingUp,
   Plus,
   Trash2,
+  Pencil,
   AlertTriangle,
   CheckCircle2,
   Target,
@@ -31,6 +32,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useExpenses } from "@/hooks/useExpenses";
 import { parseDate } from "@/components/MonthlySummary";
 import { useLang } from "@/contexts/LanguageContext";
@@ -44,6 +52,7 @@ const Overview = () => {
     incomes,
     setBudget,
     addIncome,
+    editIncome,
     deleteIncome,
   } = useExpenses();
   const { t, fmtNum, monthName } = useLang();
@@ -135,6 +144,9 @@ const Overview = () => {
   const [incomeSource, setIncomeSource] = useState("");
   const [incomeAmount, setIncomeAmount] = useState("");
   const [pendingDeleteIncome, setPendingDeleteIncome] = useState<string | null>(null);
+  const [editingIncomeId, setEditingIncomeId] = useState<string | null>(null);
+  const [editIncomeSource, setEditIncomeSource] = useState("");
+  const [editIncomeAmount, setEditIncomeAmount] = useState("");
 
   const handleAddIncome = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,6 +154,24 @@ const Overview = () => {
     addIncome(activeKey, incomeSource.trim(), parseFloat(incomeAmount));
     setIncomeSource("");
     setIncomeAmount("");
+  };
+
+  const openEditIncome = (id: string, source: string, amount: number) => {
+    setEditingIncomeId(id);
+    setEditIncomeSource(source);
+    setEditIncomeAmount(String(amount));
+  };
+
+  const handleSaveIncome = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingIncomeId || !editIncomeSource.trim() || !editIncomeAmount) return;
+    editIncome(
+      activeKey,
+      editingIncomeId,
+      editIncomeSource.trim(),
+      parseFloat(editIncomeAmount)
+    );
+    setEditingIncomeId(null);
   };
 
   const currency = t("currency");
@@ -299,6 +329,14 @@ const Overview = () => {
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-primary"
+                      onClick={() => openEditIncome(e.id, e.source, e.amount)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="h-8 w-8 text-muted-foreground hover:text-destructive"
                       onClick={() => setPendingDeleteIncome(e.id)}
                     >
@@ -416,6 +454,35 @@ const Overview = () => {
           )}
         </div>
       </main>
+
+      <Dialog open={!!editingIncomeId} onOpenChange={(o) => !o && setEditingIncomeId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("editIncomeTitle")}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSaveIncome} className="space-y-3">
+            <Input
+              value={editIncomeSource}
+              onChange={(e) => setEditIncomeSource(e.target.value)}
+              placeholder={t("incomeSourcePlaceholder")}
+              className="input-field"
+            />
+            <Input
+              type="number"
+              value={editIncomeAmount}
+              onChange={(e) => setEditIncomeAmount(e.target.value)}
+              placeholder={t("amountPlaceholder")}
+              className="input-field"
+            />
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setEditingIncomeId(null)}>
+                {t("cancel")}
+              </Button>
+              <Button type="submit" className="add-button">{t("save")}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog
         open={!!pendingDeleteIncome}

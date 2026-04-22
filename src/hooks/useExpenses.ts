@@ -253,6 +253,24 @@ export const useExpenses = () => {
     );
   };
 
+  const editIncome = async (
+    monthKey: string,
+    entryId: string,
+    source: string,
+    amount: number
+  ) => {
+    if (!ownerUid) return;
+    const current = getMonthIncome(monthKey);
+    const next = current.map((e) =>
+      e.id === entryId ? { ...e, source, amount } : e
+    );
+    await setDoc(
+      doc(db, "users", ownerUid, "incomes", monthKey),
+      { entries: next },
+      { merge: true }
+    );
+  };
+
   const deleteIncome = async (monthKey: string, entryId: string) => {
     if (!ownerUid) return;
     const current = getMonthIncome(monthKey);
@@ -287,6 +305,7 @@ export const useExpenses = () => {
     clearBudget,
     getMonthIncome,
     addIncome,
+    editIncome,
     deleteIncome,
   };
 };
